@@ -1,0 +1,49 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>230</x><y>0</y><w>300</w><h>170</h></coordinates><panel_attributes>User
+&lt;&lt;Entity&gt;&gt;
+--
++ name: string { len(0,50), NotBlank }
++ email: string { len(0,50), NotBlank, Email, Unique }
++ password: string { len(6,255), NotBlank }
++ role: Role{ Enum, NotNull, Default(USER) }
++ verified: boolean { Default(false) }
+
+- createdAt: Date { TimeStamp, auto, NotNull }
+- updatedAt: Date { TimeStamp, auto, NotNull }</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>240</x><y>270</y><w>280</w><h>160</h></coordinates><panel_attributes>Dictionary
+&lt;&lt;Entity&gt;&gt;
+--
++ name: string { len(0,100), NotBlank }
++ description: string { len(0,255), Nullable }
++ languageFrom: Language { Enum, NotNull }
++ languageTo: Language { Enum, NotNull }
+
+- createdAt: Date { TimeStamp, auto, NotNull }
+- updatedAt: Date { TimeStamp, auto, NotNull }</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>370</x><y>160</y><w>60</w><h>130</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=0..*
+▼ has</panel_attributes><additional_attributes>10;10;10;110</additional_attributes></element><element><id>UMLNote</id><coordinates><x>570</x><y>60</y><w>240</w><h>30</h></coordinates><panel_attributes>Password will be encrypted with bcrypt
+
+bg=blue</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>520</x><y>70</y><w>70</w><h>30</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>50;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>80</x><y>70</y><w>90</w><h>60</h></coordinates><panel_attributes>Role
+&lt;&lt;Enum&gt;&gt;
+--
+ADMIN,USER</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>160</x><y>80</y><w>80</w><h>30</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>10;10;60;10</additional_attributes></element><element><id>Relation</id><coordinates><x>170</x><y>340</y><w>90</w><h>30</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>10;10;70;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>330</y><w>180</w><h>110</h></coordinates><panel_attributes>Language
+&lt;&lt;Enum&gt;&gt;
+--
+SPANISH,JAPANESE, ENGLISH,
+FRENCH, GERMAN ,CHINESE ,
+KOREAN,RUSSIAN, HINDI,
+PORTUGUESE, ARABIC</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>220</x><y>530</y><w>330</w><h>200</h></coordinates><panel_attributes>Entry
+&lt;&lt;Entity&gt;&gt;
+--
++ wordFrom: string { len(0,100), NotBlank, Index }
++ languageFrom: Language { Enum, NotNull, Index }
++ wordTo: string { len(0,100), NotBlank, Index }
++ languageTo: Language { Enum, NotNull, Index }
++ category: string { len(0,50) }
++ notes: string { len(0,1000) }
++ isFavorite: boolean { Default(false) }
+
+- createdAt: Date { TimeStamp, auto, NotNull }
+- updatedAt: Date { TimeStamp, auto, NotNull }</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>370</x><y>420</y><w>60</w><h>130</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=0..*
+▼ has</panel_attributes><additional_attributes>10;10;10;110</additional_attributes></element></diagram>
