@@ -2,11 +2,31 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
- 
+  const configService = app.get(ConfigService); //Variables env
+
+  const isDeploy = configService.get<string>('DEPLOY') === 'true';
+
+  const frontendUrl = isDeploy
+    ? configService.get<string>('FRONTEND_URL_DEPLOY')
+    : configService.get<string>('FRONTEND_URL_LOCAL');
+
+  const backendUrl = isDeploy
+    ? configService.get<string>('BACKEND_URL_DEPLOY')
+    : configService.get<string>('BACKEND_URL_LOCAL');
+
+  // --- HABILITAR CORS ---
+  app.enableCors({
+    origin: frontendUrl,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+  // ----------------------
+
   //Swagger Api Docs
   const config = new DocumentBuilder()
     .setTitle('MyLexicon API Documentation')
@@ -21,6 +41,9 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 
-  console.log(`Server running on http://localhost:${process.env.PORT ?? 3000}`);
+  console.log(`\nMyLexicon API is running!`);
+  console.log(`📡 Backend URL: ${backendUrl}`);
+  console.log(`🔗 Swagger UI:  ${backendUrl}/api`);
+  console.log(`🔐 Frontend CORS: ${frontendUrl}\n`);
 }
 bootstrap();

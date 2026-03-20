@@ -1,0 +1,236 @@
+/* --- RESET --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Base de 16px. 1rem = 16px */
+body, html {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    scroll-behavior: smooth;
+    font-size: 16px; 
+}
+
+.index-container {
+    width: 100%;
+    user-select: none;
+}
+
+/* --- HERO SECTION --- */
+.index-hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.index-background {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.index-bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.6);
+}
+
+.index-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, 
+        rgba(0,0,0,0.1) 0%, 
+        rgba(0,0,0,0.4) 50%, 
+        rgba(0,0,0,1) 100%);
+    z-index: 2;
+}
+
+.index-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 0 1.5rem;
+}
+
+.index-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.index-title {
+    font-size: clamp(2.2rem, 7vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    display: flex;
+    flex-direction: column;
+}
+
+.index-brand {
+    font-size: clamp(3rem, 10vw, 6rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, #fff 30%, #a2a2a2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.index-accent-line {
+    width: 3.75rem; /* 60px */
+    height: 0.25rem; /* 4px */
+    background: #fff;
+    margin: 1rem 0;
+    border-radius: 0.125rem;
+}
+
+.index-btn-enter {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.4rem;
+    padding: 1.5rem 2rem;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.index-btn-enter:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+/* --- SCROLL MOUSE --- */
+.index-scroll-indicator {
+    position: absolute;
+    bottom: 2.5rem; /* 40px */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    opacity: 0.4;
+}
+
+.index-mouse {
+    width: 1.5rem; /* 24px */
+    height: 2.5rem; /* 40px */
+    border: 0.125rem solid #fff;
+    border-radius: 0.75rem;
+    display: flex;
+    justify-content: center;
+    padding-top: 0.5rem;
+}
+
+.index-wheel {
+    width: 0.1875rem; /* 3px */
+    height: 0.4375rem; /* 7px */
+    background: #fff;
+    border-radius: 0.125rem;
+    animation: index-scroll-anim 1.6s infinite ease;
+}
+
+@keyframes index-scroll-anim {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(0.75rem); opacity: 0; }
+}
+
+/* --- DETAILS SECTION --- */
+.index-details {
+    background-color: #000;
+    padding: 5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.index-grid {
+    max-width: 68.75rem; /* 1100px */
+    width: 100%;
+    /* Cambio a Flex para centrado perfecto en el wrap */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3rem;
+}
+
+.index-card {
+    /* El flex-basis de 17.5rem coincide con tu minmax anterior */
+    flex: 1 1 17.5rem;
+    max-width: 22rem; /* Evita que la card se estire demasiado cuando se queda sola abajo */
+    text-align: center;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.index-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.index-card-text {
+    font-size: 1rem;
+    color: #888;
+    line-height: 1.6;
+}
+
+/* --- FRASE FINAL (AJUSTADA) --- */
+.index-final-statement {
+    margin-top: 4rem;
+    padding-bottom: 2.5rem;
+    text-align: center;
+    opacity: 0.3;
+}
+
+.index-final-statement p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+/* --- RESPONSIVE MOBILE --- */
+@media (max-width: 600px) {
+    .index-details {
+        padding: 2.5rem 1.25rem;
+    }
+    
+    .index-grid {
+        gap: 1.5rem;
+    }
+
+    .index-card {
+        padding: 1.5rem 1rem;
+        flex: 1 1 100%; /* Ocupa el ancho completo en móvil */
+        max-width: 100%;
+    }
+
+    .index-scroll-indicator {
+        bottom: 3.75rem;
+    }
+
+    .index-final-statement {
+        margin-top: 3rem;
+    }
+
+    .index-final-statement p {
+        font-size: 0.75rem;
+        letter-spacing: 0.08rem;
+    }
+}

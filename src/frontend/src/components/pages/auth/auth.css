@@ -1,0 +1,167 @@
+/* --- OVERLAY (FONDO) --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.596);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-overlay.closing {
+    opacity: 0;
+}
+
+/* --- CAJA DEL MODAL --- */
+.modal-content {
+    background-color: #050505;
+    width: 100%;
+    max-width: 24rem;
+    padding: 3.5rem 2.5rem;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transform: scale(0.95) translateY(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+}
+
+.modal-content.active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+.modal-content.closing {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+}
+
+/* --- CABECERA --- */
+.modal-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.modal-header h2 {
+    font-size: 1.1rem;
+    letter-spacing: 0.3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    transition: opacity 0.3s;
+}
+
+.modal-header p {
+    font-size: 0.7rem;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    margin-top: 0.4rem;
+}
+
+/* --- FORMULARIO Y ANIMACIÓN DE CAMPOS --- */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* El truco del grid para altura automática animada */
+.input-anim-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.4s ease, opacity 0.3s ease, margin 0.4s ease;
+    overflow: hidden;
+}
+
+.input-anim-wrapper.expanded {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin-bottom: 1.2rem;
+}
+
+.input-anim-inner {
+    min-height: 0;
+}
+
+.modal-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 0.4rem;
+    color: #fff;
+    font-size: 0.85rem;
+    outline: none;
+    margin-bottom: 1.2rem; /* Separación entre inputs */
+    transition: border-color 0.3s;
+}
+
+.input-anim-inner .modal-input {
+    margin-bottom: 0; /* Evita doble margen en el input animado */
+}
+
+.modal-input:focus {
+    border-bottom: 1px solid #fff;
+}
+
+/* --- BOTÓN PRINCIPAL --- */
+.modal-submit-btn {
+    margin-top: 1rem;
+    background-color: #fff;
+    color: #000;
+    border: none;
+    padding: 1.1rem;
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 0.2rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.modal-submit-btn:hover {
+    background-color: #efefef;
+    transform: translateY(-2px);
+}
+
+/* --- FOOTER --- */
+.modal-footer {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.modal-footer button {
+    background: none;
+    border: none;
+    color: #444;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.3s;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.modal-footer button:hover { color: #888; }
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.8rem;
+    cursor: pointer;
+    opacity: 0.3;
+}

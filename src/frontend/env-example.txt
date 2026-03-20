@@ -1,0 +1,3 @@
+VITE_DEPLOY=false
+VITE_API_URL_LOCAL=http://localhost:3000
+VITE_API_URL_DEPLOY=https://api.mylexicon.com

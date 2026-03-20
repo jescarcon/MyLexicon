@@ -19,3 +19,10 @@ JWT_EXPIRES_IN=1h # Token expiration time (e.g., 1h, 2d, 30m)
 
 BCRYPT_SALT=10 # Number of salt rounds used by bcrypt to hash user passwords. Higher values increase security but also increase hashing time
 
+# ========================= CORS - FRONTEND URL =========================
+DEPLOY=false
+FRONTEND_URL_LOCAL=http://localhost:5173
+FRONTEND_URL_DEPLOY=https://mylexicon.com
+
+BACKEND_URL_LOCAL=http://localhost:3000
+BACKEND_URL_DEPLOY=https://mylexicon.com
