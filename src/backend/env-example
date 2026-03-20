@@ -1,0 +1,21 @@
+# ========================= Database Configuration =========================
+
+DB_HOST=localhost # Database server host (use localhost for local development)
+
+DB_PORT=5432 # Database server port (default for PostgreSQL is 5432)
+
+DB_USERNAME=postgres # Database username used to authenticate the connection
+
+DB_PASSWORD=password # Database user password
+
+DB_NAME=databasename # Name of the database schema used by the application
+
+
+# ========================= Authentication - JWT Configuration =========================
+
+JWT_SECRET=supersecret # Secret key used to sign and verify JWT tokens (must be strong and private in production)
+
+JWT_EXPIRES_IN=1h # Token expiration time (e.g., 1h, 2d, 30m)
+
+BCRYPT_SALT=10 # Number of salt rounds used by bcrypt to hash user passwords. Higher values increase security but also increase hashing time
+
