@@ -21,9 +21,20 @@ function AppContent() {
           <Route path="/" element={<Home />} />
 
           {/* Páginas privadas */}
-          <Route path="/mis-diccionarios/:id" element={<PrivateRoute> <Entry /> </PrivateRoute>} />
-          <Route path="/mis-diccionarios" element={<PrivateRoute> <Dictionary /> </PrivateRoute>} />
-          <Route path="/perfil" element={<PrivateRoute> <Profile /> </PrivateRoute>} />
+          <Route path="/mis-diccionarios/:id" element={
+            <PrivateRoute>
+              <Entry />
+            </PrivateRoute>} />
+
+          <Route path="/mis-diccionarios" element={
+            <PrivateRoute>
+              <Dictionary />
+            </PrivateRoute>} />
+
+          <Route path="/perfil" element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>} />
 
           {/* Página 404 */}
           <Route path="*" element={<Error />} />

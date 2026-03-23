@@ -46,16 +46,16 @@ export default function Profile() {
         });
     };
 
-    const getExpirationDate = () => {
-        if (!userData.createdAt) return null;
-        const createdDate = new Date(userData.createdAt);
-        const expirationDate = new Date(createdDate);
-        expirationDate.setMonth(expirationDate.getMonth() + 1);
-        return expirationDate.toLocaleString([], {
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit'
-        });
-    };
+    // const getExpirationDate = () => {
+    //     if (!userData.createdAt) return null;
+    //     const createdDate = new Date(userData.createdAt);
+    //     const expirationDate = new Date(createdDate);
+    //     expirationDate.setMonth(expirationDate.getMonth() + 1);
+    //     return expirationDate.toLocaleString([], {
+    //         year: 'numeric', month: '2-digit', day: '2-digit',
+    //         hour: '2-digit', minute: '2-digit'
+    //     });
+    // };
 
     const handleSaveProfile = async (e: React.FormEvent) => {
         e.preventDefault();
