@@ -23,8 +23,8 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
 
     // Lógica de entorno: Interruptor manual vía .env
     const isDeploy = import.meta.env.VITE_DEPLOY === 'true';
-    const API_URL = isDeploy 
-        ? import.meta.env.VITE_API_URL_DEPLOY 
+    const API_URL = isDeploy
+        ? import.meta.env.VITE_API_URL_DEPLOY
         : import.meta.env.VITE_API_URL_LOCAL;
     // #endregion
 
@@ -51,15 +51,16 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
     // #region --- LÓGICA DE PETICIONES (Submit) ---
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         const endpoint = isLogin ? '/auth/login' : '/users';
         const url = `${API_URL}${endpoint}`;
 
         try {
+            // 1. Petición inicial (Login o Registro)
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(isLogin 
+                body: JSON.stringify(isLogin
                     ? { email: formData.email, password: formData.password }
                     : { name: formData.name, email: formData.email, password: formData.password }
                 )
@@ -68,19 +69,37 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
             const data = await response.json();
 
             if (response.ok) {
-                const accessToken = data.access_token;
-                const finalUsername = isLogin ? data.user.name : formData.name;
+                let accessToken = data.access_token;
+                let finalUsername = isLogin ? data.user.name : formData.name;
+
+                if (!isLogin) {
+                    const loginRes = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: formData.email, password: formData.password })
+                    });
+                    const loginData = await loginRes.json();
+
+                    if (loginRes.ok) {
+                        accessToken = loginData.access_token;
+                        finalUsername = loginData.user.name;
+                    } else {
+                        alert("Cuenta creada. Por favor, accede con tus credenciales.");
+                        setIsLogin(true);
+                        return;
+                    }
+                }
 
                 login(accessToken, finalUsername);
-                
+
                 handleClose();
-                navigate('/main');
+                navigate('/mis-diccionarios');
             } else {
-                alert(data.message || 'Error en la autenticación');
+                alert(data.message || 'Error en la operación');
             }
         } catch (error) {
             console.error("Error de conexión:", error);
-            alert("Error: No se pudo conectar con el servidor en " + API_URL);
+            alert("Error: No se pudo conectar con el servidor");
         }
     };
     // #endregion
@@ -88,62 +107,62 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
     if (!isOpen && !isAnimating) return null;
 
     return (
-        <div 
-            className={`modal-overlay ${isAnimating ? 'active' : 'closing'}`} 
+        <div
+            className={`auth-modal-overlay ${isAnimating ? 'auth-active' : 'auth-closing'}`}
             onClick={handleClose}
         >
-            <div 
-                className={`modal-content ${isAnimating ? 'active' : 'closing'}`} 
+            <div
+                className={`auth-modal-content ${isAnimating ? 'auth-active' : 'auth-closing'}`}
                 onClick={(e) => e.stopPropagation()}
             >
-                <button className="modal-close" onClick={handleClose} aria-label="Cerrar">&times;</button>
-                
-                <header className="modal-header">
+                <button className="auth-modal-close" onClick={handleClose} aria-label="Cerrar">&times;</button>
+
+                <header className="auth-modal-header">
                     <h2>{isLogin ? 'ACCESO' : 'REGISTRO'}</h2>
                     <p>{isLogin ? 'Identificación de usuario' : 'Nueva cuenta del sistema'}</p>
                 </header>
 
-                <form className="modal-form" onSubmit={handleSubmit}>
-                    <div className={`input-anim-wrapper ${!isLogin ? 'expanded' : ''}`}>
-                        <div className="input-anim-inner">
-                            <input 
-                                type="text" 
+                <form className="auth-modal-form" onSubmit={handleSubmit}>
+                    <div className={`auth-input-anim-wrapper ${!isLogin ? 'auth-expanded' : ''}`}>
+                        <div className="auth-input-anim-inner">
+                            <input
+                                type="text"
                                 name="name"
-                                placeholder="NOMBRE" 
-                                className="modal-input" 
+                                placeholder="NOMBRE"
+                                className="auth-modal-input"
                                 value={formData.name}
                                 onChange={handleChange}
-                                required={!isLogin} 
+                                required={!isLogin}
                             />
                         </div>
                     </div>
 
-                    <input 
-                        type="email" 
+                    <input
+                        type="email"
                         name="email"
-                        placeholder="EMAIL" 
-                        className="modal-input" 
+                        placeholder="EMAIL"
+                        className="auth-modal-input"
                         value={formData.email}
                         onChange={handleChange}
-                        required 
+                        required
                     />
-                    
-                    <input 
-                        type="password" 
+
+                    <input
+                        type="password"
                         name="password"
-                        placeholder="CONTRASEÑA" 
-                        className="modal-input" 
+                        placeholder="CONTRASEÑA"
+                        className="auth-modal-input"
                         value={formData.password}
                         onChange={handleChange}
-                        required 
+                        required
                     />
-                    
-                    <button type="submit" className="modal-submit-btn">
+
+                    <button type="submit" className="auth-modal-submit-btn">
                         {isLogin ? 'ENTRAR' : 'CREAR CUENTA'}
                     </button>
                 </form>
 
-                <footer className="modal-footer">
+                <footer className="auth-modal-footer">
                     <button type="button" onClick={() => setIsLogin(!isLogin)}>
                         {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Accede'}
                     </button>

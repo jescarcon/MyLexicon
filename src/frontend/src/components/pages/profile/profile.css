@@ -1,0 +1,316 @@
+/* ESTRUCTURA DE LA TARJETA */
+.main-layout {
+    user-select: none;
+    padding: 5%;
+}
+
+.profile-card-container {
+    max-width: 600px;
+    margin: 4rem auto;
+    padding: 4rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-dim);
+    text-align: center;
+}
+
+.profile-section-header {
+    margin-bottom: 2rem;
+    border-left: 2px solid var(--text-primary);
+    padding-left: 1.5rem;
+}
+
+.profile-section-title {
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    color: #555555;
+    text-transform: uppercase;
+}
+
+.profile-main-name {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -2px;
+    margin-bottom: 0.5rem;
+}
+
+.profile-sub-email {
+    color: var(--text-secondary);
+    letter-spacing: 3px;
+    font-size: 1rem;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+}
+
+/* ESTADO DE VERIFICACIÓN */
+.status-badge-system {
+    display: inline-block;
+    padding: 8px 20px;
+    font-size: 0.75rem;
+    border: 1px solid;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    cursor: help;
+}
+
+.status-badge-system.status-p:hover::after {
+    content: "La cuenta se borrará el " attr(data-expiration) " si no se verifica";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-header);
+    color: var(--text-primary);
+    padding: 8px 12px;
+    border: 1px solid var(--border-medium);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.status-badge-system.status-p:hover::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--border-medium);
+    margin-bottom: -1px;
+}
+
+.status-v { color: #00f2ff; border-color: #00f2ff; }
+.status-p { color: var(--accent-red); border-color: var(--accent-red); }
+
+/* PIE DE TARJETA (METADATOS) */
+.profile-metadata-line {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--border-dim);
+    padding-top: 2rem;
+    margin-top: 3rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.profile-metadata-line strong {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.meta-value {
+    display: block;
+    font-weight: 700;
+    text-transform: none;
+    margin-top: 0.35rem;
+}
+
+.profile-status-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.profile-status-row .status-badge-system {
+    font-weight: 800;
+}
+
+.section-title {
+    text-align: center;
+    letter-spacing: 3px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    border-bottom: 1px solid var(--border-dim);
+    padding-bottom: 0.85rem;
+    width: fit-content;
+    margin: 0 auto 2rem auto;
+}
+
+.profile-buttons-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.profile-action-btn {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-medium);
+    padding: 0.6rem 1.4rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+}
+
+.profile-action-btn:hover {
+    background: var(--text-primary);
+    color: var(--bg-main);
+}
+
+.profile-action-btn.profile-action-danger {
+    color: var(--accent-red);
+    border: 1px solid #311111;
+}
+
+.profile-action-btn.profile-action-danger:hover {
+    background: var(--accent-red);
+    color: var(--text-primary);
+}
+
+.verification-info {
+    text-align: center;
+    color: #a9e6a9;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.profile-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.profile-modal-content {
+    background: var(--bg-header);
+    border: 1px solid var(--border-medium);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+}
+
+.profile-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.profile-modal-title {
+    font-size: 0.9rem;
+    letter-spacing: 4px;
+    margin-bottom: 2rem;
+    border-left: 2px solid var(--text-primary);
+    padding-left: 1rem;
+}
+
+.profile-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.profile-form-group label {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.profile-modal-input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border-dim);
+    padding: 0.8rem;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.profile-modal-input:focus {
+    border-color: var(--text-secondary);
+}
+
+.profile-modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.profile-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2.5rem;
+}
+
+.profile-btn-cancel,
+.profile-btn-confirm {
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 190px;
+    padding: 1rem 1.5rem;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+}
+
+.profile-btn-cancel {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-medium);
+}
+
+.profile-btn-cancel:hover {
+    background: var(--text-primary);
+    color: var(--bg-main);
+}
+
+.profile-btn-confirm {
+    flex: 2;
+    background: var(--text-primary);
+    color: var(--bg-main);
+    border: none;
+    padding: 1rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.profile-btn-confirm:hover {
+    background: #cccccc;
+}
+
+.profile-delete-warning {
+    color: var(--accent-red);
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+.profile-modal .profile-form-group label,
+.profile-modal .profile-form-group input {
+    font-size: 0.9rem;
+}
+
+.profile-modal .profile-btn-cancel,
+.profile-modal .profile-btn-confirm {
+    font-size: 0.8rem;
+}
+
+/* CURSOR PARA EL LOGO */
+.pointer-logo {
+    cursor: pointer;
+}

@@ -1,0 +1,28 @@
+/* =========================================
+   ESTILOS BASE - MY LEXICON PROFESSIONAL
+   ========================================= */
+
+:root {
+    --bg-main: #000000;
+    --bg-header: #080808;
+    --bg-card: #000000; /* Negro puro para que no haya saltos de color */
+    --border-dim: #111111;
+    --border-medium: #222222;
+    --text-primary: #ffffff;
+    --text-secondary: #888888;
+    --text-muted: #444444;
+    --accent-red: #ff4d4d;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}

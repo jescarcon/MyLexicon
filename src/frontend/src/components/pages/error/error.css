@@ -1,0 +1,66 @@
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background-color: #ffffff; /* blanco limpio */
+  color: #000; /* texto negro */
+  font-family: 'Arial', sans-serif;
+  padding: 2rem;
+  text-align: center;
+  user-select: none;
+}
+
+.error-content {
+  max-width: 450px;
+}
+
+.error-code {
+  font-size: 6rem;
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: 10px;
+  color: #000; /* negro intenso */
+}
+
+.error-title {
+  font-size: 2rem;
+  margin: 1rem 0;
+  font-weight: 700;
+}
+
+.error-message {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  color: #555; /* gris neutro */
+}
+
+.error-btn {
+  background-color: #000; /* negro */
+  color: #fff; /* texto blanco */
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.error-btn:hover {
+  background-color: #333; /* gris oscuro al pasar el mouse */
+  transform: translateY(-2px);
+}
+
+@media (max-width: 500px) {
+  .error-code {
+    font-size: 4rem;
+    letter-spacing: 6px;
+  }
+  .error-title {
+    font-size: 1.5rem;
+  }
+  .error-message {
+    font-size: 0.9rem;
+  }
+}

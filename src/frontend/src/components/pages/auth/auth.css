@@ -1,5 +1,5 @@
-/* --- OVERLAY (FONDO) --- */
-.modal-overlay {
+/* OVERLAY */
+.auth-modal-overlay {
     position: fixed;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.596);
@@ -14,17 +14,17 @@
     pointer-events: none;
 }
 
-.modal-overlay.active {
+.auth-modal-overlay.auth-active {
     opacity: 1;
     pointer-events: auto;
 }
 
-.modal-overlay.closing {
+.auth-modal-overlay.auth-closing {
     opacity: 0;
 }
 
-/* --- CAJA DEL MODAL --- */
-.modal-content {
+/* MODAL */
+.auth-modal-content {
     background-color: #050505;
     width: 100%;
     max-width: 24rem;
@@ -36,31 +36,30 @@
     opacity: 0;
 }
 
-.modal-content.active {
+.auth-modal-content.auth-active {
     opacity: 1;
     transform: scale(1) translateY(0);
 }
 
-.modal-content.closing {
+.auth-modal-content.auth-closing {
     opacity: 0;
     transform: scale(0.95) translateY(10px);
 }
 
-/* --- CABECERA --- */
-.modal-header {
+/* HEADER */
+.auth-modal-header {
     text-align: center;
     margin-bottom: 2.5rem;
 }
 
-.modal-header h2 {
+.auth-modal-header h2 {
     font-size: 1.1rem;
     letter-spacing: 0.3rem;
     font-weight: 800;
     text-transform: uppercase;
-    transition: opacity 0.3s;
 }
 
-.modal-header p {
+.auth-modal-header p {
     font-size: 0.7rem;
     color: #555;
     text-transform: uppercase;
@@ -68,14 +67,15 @@
     margin-top: 0.4rem;
 }
 
-/* --- FORMULARIO Y ANIMACIÓN DE CAMPOS --- */
-.modal-form {
+/* FORM */
+.auth-modal-form {
     display: flex;
     flex-direction: column;
+ 
 }
 
-/* El truco del grid para altura automática animada */
-.input-anim-wrapper {
+/* INPUT ANIM */
+.auth-input-anim-wrapper {
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
@@ -83,17 +83,18 @@
     overflow: hidden;
 }
 
-.input-anim-wrapper.expanded {
+.auth-input-anim-wrapper.auth-expanded {
     grid-template-rows: 1fr;
     opacity: 1;
     margin-bottom: 1.2rem;
 }
 
-.input-anim-inner {
+.auth-input-anim-inner {
     min-height: 0;
 }
 
-.modal-input {
+/* INPUT */
+.auth-modal-input {
     width: 100%;
     background: transparent;
     border: none;
@@ -102,20 +103,20 @@
     color: #fff;
     font-size: 0.85rem;
     outline: none;
-    margin-bottom: 1.2rem; /* Separación entre inputs */
+    margin-bottom: 1.2rem;
     transition: border-color 0.3s;
 }
 
-.input-anim-inner .modal-input {
-    margin-bottom: 0; /* Evita doble margen en el input animado */
+.auth-input-anim-inner .auth-modal-input {
+    margin-bottom: 0;
 }
 
-.modal-input:focus {
+.auth-modal-input:focus {
     border-bottom: 1px solid #fff;
 }
 
-/* --- BOTÓN PRINCIPAL --- */
-.modal-submit-btn {
+/* BUTTON */
+.auth-modal-submit-btn {
     margin-top: 1rem;
     background-color: #fff;
     color: #000;
@@ -129,18 +130,18 @@
     transition: all 0.3s ease;
 }
 
-.modal-submit-btn:hover {
+.auth-modal-submit-btn:hover {
     background-color: #efefef;
     transform: translateY(-2px);
 }
 
-/* --- FOOTER --- */
-.modal-footer {
+/* FOOTER */
+.auth-modal-footer {
     margin-top: 2rem;
     text-align: center;
 }
 
-.modal-footer button {
+.auth-modal-footer button {
     background: none;
     border: none;
     color: #444;
@@ -152,9 +153,12 @@
     text-underline-offset: 4px;
 }
 
-.modal-footer button:hover { color: #888; }
+.auth-modal-footer button:hover {
+    color: #888;
+}
 
-.modal-close {
+/* CLOSE */
+.auth-modal-close {
     position: absolute;
     top: 1rem;
     right: 1.2rem;

@@ -1,0 +1,96 @@
+.navbar-main-header {
+  background-color: var(--bg-header);
+  border-bottom: 1px solid var(--border-dim);
+  padding: 1.2rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  user-select: none;
+}
+
+.navbar-header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2.5rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.navbar-welcome-text h1 {
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.navbar-user-name {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.navbar-welcome-text p {
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.navbar-logo-text {
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 6px;
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
+  padding: 0 25px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.navbar-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.navbar-header-actions button {
+  background: transparent;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.navbar-btn-secondary {
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+}
+
+.navbar-btn-secondary:hover {
+  background: var(--text-primary);
+  color: var(--bg-main);
+}
+
+.navbar-btn-danger {
+  color: var(--accent-red);
+  border: 1px solid #311111;
+}
+
+.navbar-btn-danger:hover {
+  background: var(--accent-red);
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .navbar-header-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .navbar-header-actions {
+    justify-content: center;
+  }
+}
