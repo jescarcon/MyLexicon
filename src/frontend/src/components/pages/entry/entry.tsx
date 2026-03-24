@@ -240,15 +240,17 @@ export default function Entry() {
             : `${API_URL}/entries/${dictId}`;
 
         try {
+
+            const { wordFrom, wordTo, category, notes, isFavorite } = formData;
+
             const response = await fetch(url, {
                 method,
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({ wordFrom, wordTo, category, notes, isFavorite })
             });
-
             const data = await response.json();
 
             if (response.ok) {
@@ -381,10 +383,6 @@ export default function Entry() {
                             {errors.wordTo && <span className="entry-error">{errors.wordTo}</span>}
 
                         </div>
-
-
-                        <input type="hidden" name="languageFrom" value={formData.languageFrom} />
-                        <input type="hidden" name="languageTo" value={formData.languageTo} />
 
                         <div className="entry-form-group">
                             <label>Categoría</label>
