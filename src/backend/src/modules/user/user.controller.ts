@@ -66,7 +66,25 @@ export class UserController {
       );
     }
   }
+  // GET /users/me - PROTECTED (self)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get currently authenticated user (Self).' })
+  @ApiResponse({ status: 200, description: 'User fetched successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized: Invalid or missing JWT.' })
+  @Get('me')
+  async getMe(@Req() req: any) {
+    try {
+      // req.user viene del JwtAuthGuard
+      const userId = req.user.id;
 
+      const user = await this.userService.findOne(userId);
+
+      return { message: 'User fetched successfully', user };
+    } catch (err: any) {
+      throw new HttpException(err.message || 'User not found', HttpStatus.NOT_FOUND);
+    }
+  }
   // GET /users/:id - PROTECTED (admin or self)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

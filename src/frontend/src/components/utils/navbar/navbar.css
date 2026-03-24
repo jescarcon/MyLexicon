@@ -86,11 +86,16 @@
 
 @media (max-width: 768px) {
   .navbar-header-container {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
   }
 
   .navbar-header-actions {
     justify-content: center;
+  }
+  .navbar-welcome-text{
+    text-align: center;
   }
 }
