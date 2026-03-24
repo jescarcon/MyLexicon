@@ -63,8 +63,8 @@ export default function Entry() {
     const [categorySearchQuery, setCategorySearchQuery] = useState("");
     const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
     const [favoriteFilter, setFavoriteFilter] = useState<'all' | 'only'>('all');
-    const [currentPage,setCurrentPage] = useState(1);
-    const [itemsPerPage,setItemsPerPage] = useState(8);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(8);
     const categoryRef = useRef<HTMLDivElement | null>(null);
 
     const defaultFormData = {
@@ -78,6 +78,15 @@ export default function Entry() {
     };
 
     const [formData, setFormData] = useState(defaultFormData);
+
+    const [errors, setErrors] = useState({
+        wordFrom: '',
+        wordTo: '',
+        category: '',
+        notes: ''
+    });
+
+    const [serverError, setServerError] = useState('');
 
     const languageMap: Record<LanguageType, string> = {
         SPANISH: "ESPAÑOL",
@@ -96,7 +105,42 @@ export default function Entry() {
     const formatDate = (date: string | Date) => new Date(date).toLocaleString('es-ES', {
         day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
+    const validarFormulario = () => {
+        const nuevosErrores = {
+            wordFrom: '',
+            wordTo: '',
+            category: '',
+            notes: ''
+        };
 
+        // wordFrom
+        if (!formData.wordFrom || formData.wordFrom.trim() === '') {
+            nuevosErrores.wordFrom = "La palabra original es obligatoria.";
+        } else if (formData.wordFrom.length > 100) {
+            nuevosErrores.wordFrom = "La palabra original no puede superar los 100 caracteres.";
+        }
+
+        // wordTo
+        if (!formData.wordTo || formData.wordTo.trim() === '') {
+            nuevosErrores.wordTo = "La traducción es obligatoria.";
+        } else if (formData.wordTo.length > 100) {
+            nuevosErrores.wordTo = "La traducción no puede superar los 100 caracteres.";
+        }
+
+        // category
+        if (formData.category && formData.category.length > 50) {
+            nuevosErrores.category = "La categoría no puede superar los 50 caracteres.";
+        }
+
+        // notes
+        if (formData.notes && formData.notes.length > 500) {
+            nuevosErrores.notes = "Las notas no pueden superar los 500 caracteres.";
+        }
+
+        setErrors(nuevosErrores);
+
+        return Object.values(nuevosErrores).some(e => e !== '');
+    };
     const resetFormData = () => {
         if (dictionary) {
             setFormData({
@@ -114,6 +158,8 @@ export default function Entry() {
     const closeModal = () => {
         setIsModalOpen(false);
         resetFormData();
+        setErrors({ wordFrom: '', wordTo: '', category: '', notes: '' });
+        setServerError('');
     };
 
     const closeContextMenu = () => {
@@ -128,8 +174,8 @@ export default function Entry() {
         try {
             setLoading(true);
             const [dictRes, entryRes] = await Promise.all([
-                fetch(`${API_URL}/dictionaries/${dictId}`, { headers: { 'Authorization': `Bearer ${token}` }}),
-                fetch(`${API_URL}/entries/dictionary/${dictId}`, { headers: { 'Authorization': `Bearer ${token}` }})
+                fetch(`${API_URL}/dictionaries/${dictId}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                fetch(`${API_URL}/entries/dictionary/${dictId}`, { headers: { 'Authorization': `Bearer ${token}` } })
             ]);
 
             if (dictRes.ok) {
@@ -150,7 +196,6 @@ export default function Entry() {
 
     useEffect(() => {
         loadEntries();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dictId]);
 
     useEffect(() => {
@@ -179,8 +224,12 @@ export default function Entry() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleCreateOrUpdate = async (e: React.FormEvent) => {
+    const handleCreateOrUpdate = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const hayErrores = validarFormulario();
+        if (hayErrores) return;
+
         if (!dictId) return;
         const token = localStorage.getItem('access_token');
         if (!token) return;
@@ -197,24 +246,19 @@ export default function Entry() {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    wordFrom: formData.wordFrom,
-                    wordTo: formData.wordTo,
-                    category: formData.category,
-                    notes: formData.notes,
-                    isFavorite: formData.isFavorite,
-                })
+                body: JSON.stringify(formData)
             });
 
-            if (!response.ok) {
-                alert(isEditMode ? 'Error al actualizar entrada' : 'Error al crear entrada');
-                return;
-            }
+            const data = await response.json();
 
-            closeModal();
-            loadEntries();
+            if (response.ok) {
+                closeModal();
+                loadEntries();
+            } else {
+                setServerError(data.message || (isEditMode ? 'Error al actualizar la entrada' : 'Error al crear la entrada'));
+            }
         } catch (err) {
-            alert('Error de red con el servidor');
+            setServerError('Error de conexión con el servidor');
         }
     };
 
@@ -326,12 +370,16 @@ export default function Entry() {
                         <div className="entry-form-group">
                             <label>Palabra Origen ({languageMap[formData.languageFrom]})</label>
                             <input className="entry-modal-input" required value={formData.wordFrom} onChange={e => setFormData({ ...formData, wordFrom: e.target.value })} placeholder="Hello" />
+                            {errors.wordFrom && <span className="entry-error">{errors.wordFrom}</span>}
+
                         </div>
 
 
                         <div className="entry-form-group">
                             <label>Palabra Destino ({languageMap[formData.languageTo]})</label>
                             <input className="entry-modal-input" required value={formData.wordTo} onChange={e => setFormData({ ...formData, wordTo: e.target.value })} placeholder="Hola" />
+                            {errors.wordTo && <span className="entry-error">{errors.wordTo}</span>}
+
                         </div>
 
 
@@ -341,11 +389,13 @@ export default function Entry() {
                         <div className="entry-form-group">
                             <label>Categoría</label>
                             <input className="entry-modal-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} placeholder="Mobiliario" />
+                            {errors.category && <span className="entry-error">{errors.category}</span>}
                         </div>
 
                         <div className="entry-form-group">
                             <label>Notas</label>
                             <textarea className="entry-modal-input" value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} placeholder="Contexto adicional" rows={3} />
+                            {errors.notes && <span className="entry-error">{errors.notes}</span>}
                         </div>
 
                         <div className="entry-form-group entry-favorite-row">
@@ -353,6 +403,7 @@ export default function Entry() {
                                 <input type="checkbox" checked={formData.isFavorite} onChange={e => setFormData({ ...formData, isFavorite: e.target.checked })} /> Marcar como favorito
                             </label>
                         </div>
+                        {serverError && <div className="entry-error-server">{serverError}</div>}
 
                         <div className="entry-modal-actions">
                             <button type="submit" className="entry-btn-confirm">{isEditMode ? 'Actualizar' : 'Crear'}</button>

@@ -38,7 +38,14 @@ export default function Dictionary() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
+    const [errors, setErrors] = useState({
+        name: '',
+        description: '',
+        languageFrom: '',
+        languageTo: ''
+    });
 
+    const [serverError, setServerError] = useState('');
     const defaultFormData = {
         name: "",
         description: "",
@@ -63,6 +70,8 @@ export default function Dictionary() {
     const closeModal = () => {
         setIsModalOpen(false);
         resetFormData();
+        setErrors({ name: '', description: '', languageFrom: '', languageTo: '' });
+        setServerError('');
     };
 
     const closeContextMenu = () => {
@@ -85,7 +94,38 @@ export default function Dictionary() {
         PORTUGUESE: "PORTUGUÉS",
         ARABIC: "ÁRABE",
     };
+    const validarFormulario = () => {
+        const nuevosErrores = {
+            name: '',
+            description: '',
+            languageFrom: '',
+            languageTo: ''
+        };
 
+        // Nombre
+        if (!formData.name || formData.name.trim() === '') {
+            nuevosErrores.name = "El nombre no puede estar vacío.";
+        } else if (formData.name.length > 100) {
+            nuevosErrores.name = "El nombre no puede superar los 100 caracteres.";
+        }
+
+        // Descripción
+        if (formData.description && formData.description.length > 255) {
+            nuevosErrores.description = "La descripción no puede superar los 255 caracteres.";
+        }
+
+        // Idiomas
+        if (!Object.values(Language).includes(formData.languageFrom)) {
+            nuevosErrores.languageFrom = "Selecciona un idioma de origen válido.";
+        }
+        if (!Object.values(Language).includes(formData.languageTo)) {
+            nuevosErrores.languageTo = "Selecciona un idioma de destino válido.";
+        }
+
+        setErrors(nuevosErrores);
+
+        return Object.values(nuevosErrores).some(e => e !== '');
+    };
     const formatDate = (date: string | number | Date) => {
         return new Date(date).toLocaleString('es-ES', {
             day: '2-digit',
@@ -121,8 +161,12 @@ export default function Dictionary() {
         return () => document.removeEventListener('click', hideMenu);
     }, []);
 
-    const handleCreate = async (e: React.FormEvent) => {
+    const handleCreate = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const hayErrores = validarFormulario();
+        if (hayErrores) return;
+
         const token = localStorage.getItem('access_token');
         if (!token) return;
 
@@ -140,15 +184,23 @@ export default function Dictionary() {
                 },
                 body: JSON.stringify(formData)
             });
+
+            const data = await response.json();
+
             if (response.ok) {
                 setIsModalOpen(false);
                 resetFormData();
                 loadData();
             } else {
-                alert(isEditMode ? "Error al actualizar el diccionario" : "Error al crear el diccionario");
+                // Mostrar error del backend en rojo
+                if (data.message) {
+                    setServerError(data.message);
+                } else {
+                    setServerError(isEditMode ? "Error al actualizar el diccionario" : "Error al crear el diccionario");
+                }
             }
         } catch (err) {
-            alert("Error de conexión con el servidor");
+            setServerError("Error de conexión con el servidor");
         }
     };
 
@@ -230,6 +282,7 @@ export default function Dictionary() {
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                                 placeholder="Ej: Diccionario ING-ESP"
                             />
+                            {errors.name && <span className="dictionary-error">{errors.name}</span>}
                         </div>
 
                         <div className="dictionary-form-group">
@@ -240,6 +293,7 @@ export default function Dictionary() {
                                 onChange={e => setFormData({ ...formData, description: e.target.value })}
                                 placeholder="Términos aprendidos en clase."
                             />
+                            {errors.description && <span className="dictionary-error">{errors.description}</span>}
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -278,6 +332,7 @@ export default function Dictionary() {
                         </div>
 
                         <div className="dictionary-modal-actions">
+                            {serverError && <div className="dictionary-error-server">{serverError}</div>}
                             <button type="submit" className="dictionary-btn-confirm">
                                 {isEditMode ? "ACTUALIZAR" : "CREAR"}
                             </button>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import './auth.css';
 import { useAuth } from '../../utils/authContext/authContext';
 
@@ -12,12 +13,18 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
     // #region --- ESTADOS Y VARIABLES ---
     const [isLogin, setIsLogin] = useState(true);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [serverError, setServerError] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: ''
     });
-
+    const [errors, setErrors] = useState({
+        name: '',
+        email: '',
+        password: ''
+    });
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -37,7 +44,27 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
     // #region --- LÓGICA DE INTERFAZ (Handlers) ---
     const handleClose = () => {
         setIsAnimating(false);
-        setTimeout(onClose, 300);
+        setTimeout(() => {
+            setFormData({
+                name: '',
+                email: '',
+                password: ''
+            });
+
+            setShowPassword(false);
+
+            setErrors({
+                name: '',
+                email: '',
+                password: ''
+            });
+
+            setServerError('');
+
+            setIsLogin(true);
+
+            onClose();
+        }, 300);
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,12 +72,58 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
             ...formData,
             [e.target.name]: e.target.value
         });
+        setErrors({
+            ...errors,
+            [e.target.name]: ''
+        });
+
+        setServerError('');
+
+    };
+
+    const validarFormulario = () => {
+        const nuevosErrores = {
+            name: '',
+            email: '',
+            password: ''
+        };
+
+        if (!formData.email) {
+            nuevosErrores.email = "El email no puede estar vacío.";
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            nuevosErrores.email = "Formato de email inválido.";
+        } else if (formData.email.length > 50) {
+            nuevosErrores.email = "Máximo 50 caracteres.";
+        }
+
+        if (!formData.password) {
+            nuevosErrores.password = "La contraseña no puede estar vacía.";
+        } else if (formData.password.length < 6) {
+            nuevosErrores.password = "Mínimo 6 caracteres.";
+        } else if (formData.password.length > 255) {
+            nuevosErrores.password = "Demasiado larga.";
+        }
+
+        if (!isLogin) {
+            if (!formData.name) {
+                nuevosErrores.name = "El nombre no puede estar vacío.";
+            } else if (formData.name.length > 50) {
+                nuevosErrores.name = "Máximo 50 caracteres.";
+            }
+        }
+
+        setErrors(nuevosErrores);
+
+        return Object.values(nuevosErrores).some(e => e !== '');
     };
     // #endregion
 
     // #region --- LÓGICA DE PETICIONES (Submit) ---
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const hayErrores = validarFormulario();
+        if (hayErrores) return;
 
         const endpoint = isLogin ? '/auth/login' : '/users';
         const url = `${API_URL}${endpoint}`;
@@ -84,7 +157,6 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
                         accessToken = loginData.access_token;
                         finalUsername = loginData.user.name;
                     } else {
-                        alert("Cuenta creada. Por favor, accede con tus credenciales.");
                         setIsLogin(true);
                         return;
                     }
@@ -95,11 +167,15 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
                 handleClose();
                 navigate('/mis-diccionarios');
             } else {
-                alert(data.message || 'Error en la operación');
+                if (data.message === "Invalid credentials") {
+                    setServerError("Email o contraseña incorrectos");
+                } else {
+                    setServerError(data.message || "Error en la operación");
+                }
             }
         } catch (error) {
             console.error("Error de conexión:", error);
-            alert("Error: No se pudo conectar con el servidor");
+            setServerError("No se pudo conectar con el servidor");
         }
     };
     // #endregion
@@ -134,6 +210,7 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
                                 onChange={handleChange}
                                 required={!isLogin}
                             />
+                            {errors.name && <span className="auth-error">{errors.name}</span>}
                         </div>
                     </div>
 
@@ -146,16 +223,28 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
                         onChange={handleChange}
                         required
                     />
+                    {errors.email && <span className="auth-error">{errors.email}</span>}
 
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="CONTRASEÑA"
-                        className="auth-modal-input"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
+                    <div className="auth-password-wrapper">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="CONTRASEÑA"
+                            className="auth-modal-input"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                        />
+
+                        <button
+                            type="button"
+                            className="auth-show-password-btn"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label="Mostrar u ocultar contraseña"
+                        >
+                            {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}                        </button>
+                    </div>
+                    {errors.password && <span className="auth-error">{errors.password}</span>}
 
                     <button type="submit" className="auth-modal-submit-btn">
                         {isLogin ? 'ENTRAR' : 'CREAR CUENTA'}
@@ -163,6 +252,11 @@ export default function Auth({ isOpen, onClose }: AuthProps) {
                 </form>
 
                 <footer className="auth-modal-footer">
+                    {serverError && (
+                        <div className="auth-error-server">
+                            {serverError}
+                        </div>
+                    )}
                     <button type="button" onClick={() => setIsLogin(!isLogin)}>
                         {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Accede'}
                     </button>

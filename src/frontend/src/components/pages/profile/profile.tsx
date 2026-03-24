@@ -10,7 +10,13 @@ const API_URL = import.meta.env.VITE_DEPLOY === 'true'
 export default function Profile() {
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const [errors, setErrors] = useState({
+        name: '',
+        email: '',
+        password: ''
+    });
 
+    const [serverError, setServerError] = useState('');
     const [userData, setUserData] = useState<any>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -49,7 +55,32 @@ export default function Profile() {
 
     if (!token) return <div className="list-status">ACCESO DENEGADO</div>;
     if (!userData) return <div className="list-status">CARGANDO DATOS...</div>;
+    const validarFormulario = () => {
+        const nuevosErrores = { name: '', email: '', password: '' };
 
+        // Nombre
+        if (!formData.name.trim()) {
+            nuevosErrores.name = "El nombre es obligatorio.";
+        } else if (formData.name.length > 100) {
+            nuevosErrores.name = "El nombre no puede superar los 100 caracteres.";
+        }
+
+        // Email
+        if (!formData.email.trim()) {
+            nuevosErrores.email = "El email es obligatorio.";
+        } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+            nuevosErrores.email = "El email no es válido.";
+        }
+
+        // Password (opcional)
+        if (formData.password && formData.password.length < 6) {
+            nuevosErrores.password = "La contraseña debe tener al menos 6 caracteres.";
+        }
+
+        setErrors(nuevosErrores);
+
+        return Object.values(nuevosErrores).some(e => e !== '');
+    };
     const formatDate = (date: string) => {
         if (!date) return "-- : --";
         return new Date(date).toLocaleString([], {
@@ -59,8 +90,12 @@ export default function Profile() {
     };
 
     // Guardar cambios del perfil
-    const handleSaveProfile = async (e: React.FormEvent) => {
+    const handleSaveProfile = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const hayErrores = validarFormulario();
+        if (hayErrores) return;
+
         const userId = userData.id;
         if (!token || !userId) return;
 
@@ -78,18 +113,19 @@ export default function Profile() {
                 })
             });
 
-            if (!res.ok) throw new Error('No se pudo actualizar');
-
             const data = await res.json();
-            setUserData(data.updatedUser);
-            
-            // Si el backend devuelve un nuevo token al actualizar email o password:
-            if (data.access_token) localStorage.setItem('access_token', data.access_token);
 
+            if (!res.ok) {
+                setServerError(data.message || 'No se pudo actualizar el perfil.');
+                return;
+            }
+
+            setUserData(data.updatedUser);
+            if (data.access_token) localStorage.setItem('access_token', data.access_token);
             setIsEditModalOpen(false);
             alert('Perfil actualizado correctamente');
         } catch (err) {
-            alert('Hubo un error actualizando el perfil');
+            setServerError('Error de conexión con el servidor.');
         }
     };
 
@@ -138,11 +174,11 @@ export default function Profile() {
 
                     <div className="profile-metadata-line">
                         <div>
-                            <strong>CUENTA CREADA</strong><br/>
+                            <strong>CUENTA CREADA</strong><br />
                             <span className="meta-value">{formatDate(userData.createdAt)}</span>
                         </div>
                         <div>
-                            <strong>ÚLTIMA ACTUALIZACIÓN</strong><br/>
+                            <strong>ÚLTIMA ACTUALIZACIÓN</strong><br />
                             <span className="meta-value">{formatDate(userData.updatedAt)}</span>
                         </div>
                     </div>
@@ -159,15 +195,19 @@ export default function Profile() {
                             <div className="profile-form-group">
                                 <label>Nombre</label>
                                 <input className="profile-modal-input" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                                {errors.name && <span className="profile-error">{errors.name}</span>}
                             </div>
                             <div className="profile-form-group">
                                 <label>Email</label>
                                 <input className="profile-modal-input" type="email" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+                                {errors.email && <span className="profile-error">{errors.email}</span>}
                             </div>
                             <div className="profile-form-group">
                                 <label>Nueva contraseña</label>
                                 <input className="profile-modal-input" type="password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="Dejar vacío para no cambiarla." />
+                                {errors.password && <span className="profile-error">{errors.password}</span>}
                             </div>
+                            {serverError && <div className="profile-error-server">{serverError}</div>}
                             <div className="profile-modal-actions">
                                 <button type="submit" className="profile-btn-confirm">Guardar</button>
                             </div>
@@ -187,12 +227,12 @@ export default function Profile() {
                             <p className="profile-delete-warning">Se borrará <strong>todo</strong> lo relacionado con tu cuenta.</p>
                             <div className="profile-form-group">
                                 <label>Escribe "ELIMINAR CUENTA" para confirmar:</label>
-                                <input 
-                                    className="profile-modal-input" 
-                                    type="text" 
-                                    value={deleteConfirmText} 
-                                    onChange={e => setDeleteConfirmText(e.target.value)} 
-                                    placeholder="ELIMINAR CUENTA" 
+                                <input
+                                    className="profile-modal-input"
+                                    type="text"
+                                    value={deleteConfirmText}
+                                    onChange={e => setDeleteConfirmText(e.target.value)}
+                                    placeholder="ELIMINAR CUENTA"
                                 />
                             </div>
                             <div className="profile-modal-actions">

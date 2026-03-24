@@ -7,6 +7,7 @@ import Navbar from './components/utils/navbar/navbar'
 import PrivateRoute from './components/utils/privateRoute/privateRoute'
 import Error from './components/pages/error/error'
 import Entry from './components/pages/entry/entry'
+import PublicRoute from './components/utils/publicRoute/publicRoute'
 
 function AppContent() {
   const { user, logout } = useAuth()
@@ -18,8 +19,12 @@ function AppContent() {
       <div className="content">
         <Routes>
           {/* Páginas públicas */}
-          <Route path="/" element={<Home />} />
-
+          <Route path="/" element={
+            <PublicRoute>
+              <Home />
+            </PublicRoute>
+          } />
+          
           {/* Páginas privadas */}
           <Route path="/mis-diccionarios/:id" element={
             <PrivateRoute>

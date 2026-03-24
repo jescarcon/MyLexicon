@@ -127,6 +127,21 @@
     margin-top: 0.35rem;
 }
 
+.profile-error {
+    display: block;
+    color: #ff4d4f;
+    font-size: 0.75rem;
+    margin-top: -0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.profile-error-server {
+    color: #ff4d4f;
+    font-size: 0.8rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
 .profile-status-row {
     display: flex;
     justify-content: center;
