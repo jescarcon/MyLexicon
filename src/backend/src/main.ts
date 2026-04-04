@@ -1,14 +1,25 @@
+import { webcrypto } from 'node:crypto';
+// Parche para Node 18 (Crypto global)
+if (!globalThis.crypto) {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto,
+    writable: false,
+    configurable: true
+  });
+}
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService); //Variables env
+  
+  // 1. Prefijo Global (Vital para que coincida con Apache)
+  app.setGlobalPrefix('api-mylexicon');
 
+  const configService = app.get(ConfigService);
   const isDeploy = configService.get<string>('DEPLOY') === 'true';
 
   const frontendUrl = isDeploy
@@ -25,9 +36,8 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
-  // ----------------------
 
-  //Swagger Api Docs
+  // --- Swagger Api Docs ---
   const config = new DocumentBuilder()
     .setTitle('MyLexicon API Documentation')
     .addBearerAuth()
@@ -36,12 +46,15 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-  //Swagger Api Docs
+  
+  // 3. Setup de Swagger: Debe apuntar a 'api' dentro del contexto del prefijo
+  // La URL real será: jescarcon.ddns.net/api-mylexicon/api
+  SwaggerModule.setup('api-mylexicon/api', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  // Iniciar servidor
+  await app.listen(process.env.PORT ?? 3000,'0.0.0.0');
 
-  console.log(`\nMyLexicon API is running!`);
+  console.log(`\n🚀 MyLexicon API is running!`);
   console.log(`📡 Backend URL: ${backendUrl}`);
   console.log(`🔗 Swagger UI:  ${backendUrl}/api`);
   console.log(`🔐 Frontend CORS: ${frontendUrl}\n`);

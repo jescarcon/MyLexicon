@@ -11,7 +11,7 @@ export default function Home() {
             {/* HERO */}
             <section className="home-hero">
                 <div className="home-background">
-                    <img src="/earth.jpg" alt="Planeta Tierra" className="home-bg-image" />
+                    <img src="/mylexicon/earth.jpg" alt="Planeta Tierra" className="home-bg-image" />
                     <div className="home-overlay"></div>
                 </div>
 

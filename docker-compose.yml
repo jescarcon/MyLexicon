@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  lexicon-backend:
+    build: ./src/backend
+    container_name: lexicon-backend
+    env_file:
+      - ./src/backend/.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "3000:3000"
+    restart: always
+
+  lexicon-frontend:
+    build: ./src/frontend
+    container_name: lexicon-frontend
+    env_file:
+      - ./src/frontend/.env
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "5173:5173"
+    restart: always
