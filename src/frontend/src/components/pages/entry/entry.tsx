@@ -330,7 +330,12 @@ export default function Entry() {
     };
 
     const categories = useMemo(() => {
-        const unique = Array.from(new Set(entries.filter(e => e.category).map(e => e.category!.trim()).filter(Boolean)));
+        const allCategories = entries.flatMap(e =>
+            e.category
+                ? e.category.split(',').map(cat => cat.trim()).filter(Boolean)
+                : []
+        );
+        const unique = Array.from(new Set(allCategories));
         return unique.sort((a, b) => a.localeCompare(b, 'es-ES'));
     }, [entries]);
 
@@ -346,9 +351,14 @@ export default function Entry() {
                 e.wordTo.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 (e.category ?? '').toLowerCase().includes(searchQuery.toLowerCase());
 
+            // Nueva lógica para categorías múltiples
+            const entryCategories = e.category
+                ? e.category.split(',').map(c => c.trim().toLowerCase())
+                : [];
+
             const matchesCategory = selectedCategories.length === 0
                 ? true
-                : selectedCategories.includes((e.category ?? '').trim());
+                : selectedCategories.some(cat => entryCategories.includes(cat.toLowerCase()));
 
             const matchesFavorite = favoriteFilter === 'all' ? true : !!e.isFavorite;
 
@@ -385,8 +395,8 @@ export default function Entry() {
                         </div>
 
                         <div className="entry-form-group">
-                            <label>Categoría</label>
-                            <input className="entry-modal-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} placeholder="Mobiliario" />
+                            <label>Categoría (Usa comas para añadir múltiples)</label>
+                            <input className="entry-modal-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} placeholder="Mobiliario, Madera" />
                             {errors.category && <span className="entry-error">{errors.category}</span>}
                         </div>
 
