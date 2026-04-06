@@ -57,7 +57,7 @@ export default function Entry() {
     const [selectedEntry, setSelectedEntry] = useState<EntryItem | null>(null);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, item: null as EntryItem | null });
-
+    const [modalCategoryDropdownOpen, setModalCategoryDropdownOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [categorySearchQuery, setCategorySearchQuery] = useState("");
@@ -165,7 +165,16 @@ export default function Entry() {
     const closeContextMenu = () => {
         setContextMenu({ visible: false, x: 0, y: 0, item: null });
     };
-
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (categoryRef.current && !categoryRef.current.contains(event.target as Node)) {
+                setCategoryDropdownOpen(false);      // Cierra el del filtro
+                setModalCategoryDropdownOpen(false); // Cierra el del modal
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
     const loadEntries = async () => {
         if (!dictId) return;
         const token = localStorage.getItem('access_token');
@@ -394,15 +403,79 @@ export default function Entry() {
 
                         </div>
 
-                        <div className="entry-form-group">
-                            <label>Categoría (Usa comas para añadir múltiples)</label>
-                            <input className="entry-modal-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} placeholder="Mobiliario, Madera" />
-                            {errors.category && <span className="entry-error">{errors.category}</span>}
+                        <div className="entry-form-group" ref={categoryRef}>
+                            <label>Categorías (Escribe o selecciona)</label>
+
+                            <input
+                                className="entry-modal-input"
+                                value={formData.category}
+                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                onFocus={() => setModalCategoryDropdownOpen(true)}
+                                placeholder="Ej: Comida, Profesiones..."
+                                maxLength={100}
+                            />
+
+                            {modalCategoryDropdownOpen && (
+                                <div className="entry-category-dropdown open">
+                                    <div className="entry-category-actions">
+                                        <button type="button" className="entry-category-small-btn"
+                                            onClick={() => setFormData({ ...formData, category: '' })}>
+                                            Limpiar todo
+                                        </button>
+                                        <button type="button" className="entry-category-small-btn"
+                                            onClick={() => setModalCategoryDropdownOpen(false)}>
+                                            Cerrar
+                                        </button>
+                                    </div>
+
+                                    <div className="entry-category-divider"></div>
+
+                                    <div className="entry-category-list-container">
+                                        {categories.length > 0 ? (
+                                            <div className="entry-category-columns">
+                                                {categories.map(cat => {
+                                                    const currentTags = formData.category.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+                                                    const isSelected = currentTags.includes(cat.toLowerCase());
+
+                                                    return (
+                                                        <label key={cat} className="entry-category-item">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={isSelected}
+                                                                onChange={() => {
+                                                                    let tags = formData.category.split(',').map(t => t.trim()).filter(Boolean);
+                                                                    if (isSelected) {
+                                                                        tags = tags.filter(t => t.toLowerCase() !== cat.toLowerCase());
+                                                                    } else {
+                                                                        tags.push(cat);
+                                                                    }
+                                                                    setFormData({ ...formData, category: tags.join(', ') });
+                                                                }}
+                                                            />
+                                                            <span>{cat}</span>
+                                                        </label>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <span className="entry-category-empty">No hay categorías previas</span>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="entry-form-group">
                             <label>Notas</label>
-                            <textarea className="entry-modal-input" value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} placeholder="Contexto adicional" rows={3} />
+                            <textarea
+                                className="entry-modal-input"
+                                value={formData.notes}
+                                onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                                placeholder="Contexto adicional"
+                                rows={3}
+                                maxLength={500}
+                                style={{ resize: 'none' }}
+                            />
                             {errors.notes && <span className="entry-error">{errors.notes}</span>}
                         </div>
 
@@ -417,30 +490,6 @@ export default function Entry() {
                             <button type="submit" className="entry-btn-confirm">{isEditMode ? 'Actualizar' : 'Crear'}</button>
                         </div>
                     </form>
-                </div>
-            )}
-
-            {contextMenu.visible && contextMenu.item && (
-                <div className="entry-context-menu" style={{ top: contextMenu.y, left: contextMenu.x }} onClick={e => e.stopPropagation()}>
-                    <button onClick={() => contextMenu.item && openEditModal(contextMenu.item)}>Editar</button>
-                    <button onClick={() => contextMenu.item && openDeleteConfirm(contextMenu.item)}>Eliminar</button>
-                </div>
-            )}
-
-            {isDeleteConfirmOpen && selectedEntry && (
-                <div className="entry-modal-overlay" onClick={() => setIsDeleteConfirmOpen(false)}>
-                    <div className="entry-modal-content" onClick={e => e.stopPropagation()}>
-                        <div className="entry-modal-header">
-                            <h2 className="entry-modal-title">CONFIRMAR BORRADO</h2>
-                            <button type="button" className="entry-modal-close" onClick={() => setIsDeleteConfirmOpen(false)}>×</button>
-                        </div>
-                        <p>¿Seguro que quieres eliminar la entrada <strong>{selectedEntry.wordFrom} → {selectedEntry.wordTo}</strong>?</p>
-                        <p className="entry-delete-warning">Se eliminará permanentemente.</p>
-                        <div className="entry-modal-actions">
-                            <button type="button" className="entry-btn-cancel" onClick={() => setIsDeleteConfirmOpen(false)}>Cancelar</button>
-                            <button type="button" className="entry-btn-confirm" onClick={handleDelete}>Eliminar</button>
-                        </div>
-                    </div>
                 </div>
             )}
 
@@ -469,7 +518,7 @@ export default function Entry() {
                 </section>
 
                 <section className="entry-dashboard-actions">
-                    <div className="entry-category-filter" ref={categoryRef}>
+                    <div className="entry-category-filter" ref={categoryRef} >
                         <input
                             className="entry-search-input"
                             type="text"
@@ -494,25 +543,31 @@ export default function Entry() {
                         <div className={`entry-category-dropdown ${categoryDropdownOpen ? 'open' : ''}`}>
                             <div className="entry-category-actions">
                                 <button className="entry-category-small-btn" type="button" onClick={() => { setSelectedCategories([]); setCategoryDropdownOpen(true); }}>Quitar todas</button>
+                                <button type="button" className="entry-category-small-btn"
+                                    onClick={() => setCategoryDropdownOpen(false)}>
+                                    Cerrar
+                                </button>
                             </div>
                             <div className="entry-category-divider"></div>
-                            {visibleCategories.length > 0 ? visibleCategories.map(cat => (
-                                <label className="entry-category-option" key={cat}>
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedCategories.includes(cat)}
-                                        onChange={() => {
-                                            setSelectedCategories(prev =>
-                                                prev.includes(cat)
-                                                    ? prev.filter(c => c !== cat)
-                                                    : [...prev, cat]
-                                            );
-                                            setCategoryDropdownOpen(true);
-                                        }}
-                                    />
-                                    {cat}
-                                </label>
-                            )) : <span className="entry-category-empty">No hay categorías</span>}
+                            <div className="entry-category-list">
+                                {visibleCategories.length > 0 ? visibleCategories.map(cat => (
+                                    <label className="entry-category-option" key={cat}>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedCategories.includes(cat)}
+                                            onChange={() => {
+                                                setSelectedCategories(prev =>
+                                                    prev.includes(cat)
+                                                        ? prev.filter(c => c !== cat)
+                                                        : [...prev, cat]
+                                                );
+                                                setCategoryDropdownOpen(true);
+                                            }}
+                                        />
+                                        {cat}
+                                    </label>
+                                )) : <span className="entry-category-empty">No hay categorías</span>}
+                            </div>
                         </div>
                     </div>
 
@@ -568,6 +623,31 @@ export default function Entry() {
                 </div>
 
             </main>
+            {contextMenu.visible && contextMenu.item && (
+                <div className="entry-context-menu" style={{ top: contextMenu.y, left: contextMenu.x }} onClick={e => e.stopPropagation()}>
+                    <button onClick={() => contextMenu.item && openEditModal(contextMenu.item)}>Editar</button>
+                    <button onClick={() => contextMenu.item && openDeleteConfirm(contextMenu.item)}>Eliminar</button>
+                </div>
+            )}
+
+            {isDeleteConfirmOpen && selectedEntry && (
+                <div className="entry-modal-overlay" onClick={() => setIsDeleteConfirmOpen(false)}>
+                    <div className="entry-modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="entry-modal-header">
+                            <h2 className="entry-modal-title">CONFIRMAR BORRADO</h2>
+                            <button type="button" className="entry-modal-close" onClick={() => setIsDeleteConfirmOpen(false)}>×</button>
+                        </div>
+                        <p>¿Seguro que quieres eliminar la entrada <strong>{selectedEntry.wordFrom} → {selectedEntry.wordTo}</strong>?</p>
+                        <p className="entry-delete-warning">Se eliminará permanentemente.</p>
+                        <div className="entry-modal-actions">
+                            <button type="button" className="entry-btn-cancel" onClick={() => setIsDeleteConfirmOpen(false)}>Cancelar</button>
+                            <button type="button" className="entry-btn-confirm" onClick={handleDelete}>Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
         </div>
     );
 }
