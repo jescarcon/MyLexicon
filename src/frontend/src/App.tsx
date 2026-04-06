@@ -51,7 +51,7 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/mylexicon">
+    <BrowserRouter basename="/mylexicon/">
       <AuthProvider>
         <AppContent />
       </AuthProvider>
