@@ -284,11 +284,12 @@
     resize: none;
 }
 
-/* El contenedor que acabamos de crear */
 .entry-category-list {
     column-count: 2;
     column-gap: 20px;
     padding: 10px;
+    overflow-y: auto;   
+    flex-grow: 1;
 }
 
 .entry-category-option {
@@ -574,7 +575,6 @@
     position: absolute;
     width: 100%;
     max-height: 230px;
-    overflow-y: auto;
     background: var(--bg-header);
     border: 1px solid var(--border-medium);
     border-radius: 3px;
@@ -582,7 +582,8 @@
     margin-top: 0;
     z-index: 999;
     display: none;
-
+    flex-direction: column;
+    overflow: hidden;
     top: 100%;
     left: 0;
     z-index: 20;
@@ -590,10 +591,14 @@
 
 
 .entry-category-actions {
+
     display: flex;
     justify-content: space-between;
     gap: 0.4rem;
-    padding: 0.35rem;
+    padding: 0.6rem;
+    background: var(--bg-header);
+    flex-shrink: 0;
+    z-index: 2;
 }
 
 .entry-category-small-btn {
@@ -616,7 +621,7 @@
 }
 
 .entry-category-dropdown.open {
-    display: block;
+    display: flex;
 }
 
 .entry-category-option {

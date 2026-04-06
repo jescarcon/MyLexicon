@@ -17,7 +17,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   // 1. Prefijo Global (Vital para que coincida con Apache)
-  app.setGlobalPrefix('api-mylexicon');
+ // app.setGlobalPrefix('api-mylexicon');
 
   const configService = app.get(ConfigService);
   const isDeploy = configService.get<string>('DEPLOY') === 'true';

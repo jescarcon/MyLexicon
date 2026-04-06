@@ -66,6 +66,8 @@ export default function Entry() {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(8);
     const categoryRef = useRef<HTMLDivElement | null>(null);
+    const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+    const [modalCategorySearch, setModalCategorySearch] = useState('');
 
     const defaultFormData = {
         wordFrom: "",
@@ -354,13 +356,12 @@ export default function Entry() {
     }, [categories, categorySearchQuery]);
 
     const filteredEntries = useMemo(() => {
-        return entries.filter(e => {
+        const result = entries.filter(e => {
             const matchesText =
                 e.wordFrom.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 e.wordTo.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 (e.category ?? '').toLowerCase().includes(searchQuery.toLowerCase());
 
-            // Nueva lógica para categorías múltiples
             const entryCategories = e.category
                 ? e.category.split(',').map(c => c.trim().toLowerCase())
                 : [];
@@ -373,8 +374,15 @@ export default function Entry() {
 
             return matchesText && matchesCategory && matchesFavorite;
         });
-    }, [searchQuery, selectedCategories, favoriteFilter, entries]);
 
+        // Lógica de ordenación por fecha
+        return result.sort((a, b) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+
+            return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+        });
+    }, [searchQuery, selectedCategories, favoriteFilter, entries, sortOrder]); // Añadido sortOrder a dependencias
     const totalPages = Math.max(1, Math.ceil(filteredEntries.length / itemsPerPage));
     const paginatedEntries = filteredEntries.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -417,13 +425,33 @@ export default function Entry() {
 
                             {modalCategoryDropdownOpen && (
                                 <div className="entry-category-dropdown open">
-                                    <div className="entry-category-actions">
+                                    <div className="entry-category-actions" style={{ alignItems: 'center' }}>
                                         <button type="button" className="entry-category-small-btn"
                                             onClick={() => setFormData({ ...formData, category: '' })}>
                                             Limpiar todo
                                         </button>
+
+                                        {/* --- NUEVO BUSCADOR DE CATEGORÍAS --- */}
+                                        <input
+                                            type="text"
+                                            className="entry-modal-input"
+                                            style={{
+                                                margin: '0 10px',
+                                                padding: '5px 10px',
+                                                fontSize: '0.75rem',
+                                                height: 'auto',
+                                                flex: 1
+                                            }}
+                                            placeholder="Buscar categoría..."
+                                            value={modalCategorySearch}
+                                            onChange={(e) => setModalCategorySearch(e.target.value)}
+                                        />
+
                                         <button type="button" className="entry-category-small-btn"
-                                            onClick={() => setModalCategoryDropdownOpen(false)}>
+                                            onClick={() => {
+                                                setModalCategoryDropdownOpen(false);
+                                                setModalCategorySearch(''); // Limpiamos búsqueda al cerrar
+                                            }}>
                                             Cerrar
                                         </button>
                                     </div>
@@ -433,32 +461,39 @@ export default function Entry() {
                                     <div className="entry-category-list-container">
                                         {categories.length > 0 ? (
                                             <div className="entry-category-columns">
-                                                {categories.map(cat => {
-                                                    const currentTags = formData.category.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
-                                                    const isSelected = currentTags.includes(cat.toLowerCase());
+                                                {categories
+                                                    .filter(cat => cat.toLowerCase().includes(modalCategorySearch.toLowerCase()))
+                                                    .map(cat => {
+                                                        const currentTags = formData.category.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+                                                        const isSelected = currentTags.includes(cat.toLowerCase());
 
-                                                    return (
-                                                        <label key={cat} className="entry-category-item">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={isSelected}
-                                                                onChange={() => {
-                                                                    let tags = formData.category.split(',').map(t => t.trim()).filter(Boolean);
-                                                                    if (isSelected) {
-                                                                        tags = tags.filter(t => t.toLowerCase() !== cat.toLowerCase());
-                                                                    } else {
-                                                                        tags.push(cat);
-                                                                    }
-                                                                    setFormData({ ...formData, category: tags.join(', ') });
-                                                                }}
-                                                            />
-                                                            <span>{cat}</span>
-                                                        </label>
-                                                    );
-                                                })}
+                                                        return (
+                                                            <label key={cat} className="entry-category-item">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={isSelected}
+                                                                    onChange={() => {
+                                                                        let tags = formData.category.split(',').map(t => t.trim()).filter(Boolean);
+                                                                        if (isSelected) {
+                                                                            tags = tags.filter(t => t.toLowerCase() !== cat.toLowerCase());
+                                                                        } else {
+                                                                            tags.push(cat);
+                                                                        }
+                                                                        setFormData({ ...formData, category: tags.join(', ') });
+                                                                    }}
+                                                                />
+                                                                <span>{cat}</span>
+                                                            </label>
+                                                        );
+                                                    })
+                                                }
                                             </div>
                                         ) : (
                                             <span className="entry-category-empty">No hay categorías previas</span>
+                                        )}
+
+                                        {categories.filter(cat => cat.toLowerCase().includes(modalCategorySearch.toLowerCase())).length === 0 && modalCategorySearch && (
+                                            <span className="entry-category-empty">No se encontraron coincidencias</span>
                                         )}
                                     </div>
                                 </div>
@@ -572,15 +607,30 @@ export default function Entry() {
                     </div>
 
                     <div className="entry-favorites-filter">
+                        <button
+                            className={`entry-favorites-btn ${sortOrder === 'asc' ? 'active' : ''}`}
+                            onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+                        >
+                            {sortOrder === 'desc' ? ' recientes' : ' antiguos'}
+                        </button>
                         <button className={`entry-favorites-btn ${favoriteFilter === 'only' ? 'active' : ''}`} onClick={() => setFavoriteFilter(prev => prev === 'only' ? 'all' : 'only')}>Ver Favoritos</button>
-                        <button className="entry-favorites-btn entry-clear-btn" onClick={() => { setCategorySearchQuery(''); setSelectedCategories([]); setFavoriteFilter('all'); setCategoryDropdownOpen(false); }}>Borrar filtros</button>
+                        <button className="entry-favorites-btn entry-clear-btn"
+                            onClick={() => {
+                                setCategorySearchQuery('');
+                                setSelectedCategories([]);
+                                setFavoriteFilter('all');
+                                setCategoryDropdownOpen(false);
+                                setSortOrder('desc');
+                                setItemsPerPage(6);
+                                setCurrentPage(1);
+                            }}>Borrar filtros</button>
                     </div>
                 </section>
 
                 <footer className="entry-pagination-wrapper">
                     <div className="entry-items-per-page">
                         <span>MOSTRAR:</span>
-                        {[8, 12, 16].map(num => (
+                        {[6, 9, 12].map(num => (
                             <button key={num} className={`entry-num-btn ${itemsPerPage === num ? 'active' : ''}`} onClick={() => setItemsPerPage(num)}>{num}</button>
                         ))}
                     </div>
