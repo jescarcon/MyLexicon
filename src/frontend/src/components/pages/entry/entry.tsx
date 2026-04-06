@@ -64,7 +64,7 @@ export default function Entry() {
     const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
     const [favoriteFilter, setFavoriteFilter] = useState<'all' | 'only'>('all');
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(8);
+    const [itemsPerPage, setItemsPerPage] = useState(6);
     const categoryRef = useRef<HTMLDivElement | null>(null);
     const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
     const [modalCategorySearch, setModalCategorySearch] = useState('');
